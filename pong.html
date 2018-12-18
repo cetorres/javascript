@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Pong Game</title>
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    <script>
+        /**
+         * Pong Game in plain Javascript
+         * 
+         * Author: Carlos E. Torres
+         * E-mail: cetorres@cetorres.com          
+         */
+        var canvas;
+        var canvasContext;
+
+        var ballX = 0;
+        var ballY = 0;
+        const ballSize = 20;
+        const framesPerSecond = 170;
+        var ballXVelocity = ballYVelocity = 1;
+
+        const padWidth = 15;
+        const padHeight = 120;
+        const padSpeedIncrement = 2;
+        const padOffset = 10;
+        var pad1Y = 0;
+        var pad2Y = 0;
+        var pad1Speed = 0;
+        var pad2Speed = 0;
+        var pad1X = 0;
+        var pad2X = 0;
+
+        var pad1Score = 0;
+        var pad2Score = 0;
+
+        var computerRate = 3.1;
+
+        window.onload = function () {
+            canvas = document.getElementById("gameCanvas");
+            canvasContext = canvas.getContext("2d");
+
+            pad1X = padOffset;
+            pad2X = canvas.width - padOffset - padWidth;
+            pad1Y = canvas.height / 2 - padHeight / 2;
+            pad2Y = canvas.height / 2 - padHeight / 2;
+
+            ballXVelocity = Math.floor(Math.random() * 2) % 2 == 0 ? 1 : -1
+            resetGame();
+
+            document.addEventListener("keydown", keyPush);
+            document.addEventListener("keyup", keyUp);
+            setInterval(game, 1000 / framesPerSecond);
+        }
+
+        function game() {
+            // Draw background
+            canvasContext.fillStyle = "black";
+            canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Check ball collision with border
+            if (ballX < 0) {
+                pad2Score++;
+                resetGame();
+            }
+            if (ballX > canvas.width) {
+                pad1Score++;
+                if (pad1Score % 3 == 0)
+                    computerRate -= 0.1;
+                resetGame();
+            }
+            if (ballY < ballSize / 2) {
+                ballYVelocity *= -1;
+            }
+            if (ballY > canvas.height - ballSize / 2) {
+                ballYVelocity *= -1;
+            }
+
+            // Check pad1 collision with border
+            if (pad1Y < padOffset + padSpeedIncrement) {
+                pad1Y = padOffset + padSpeedIncrement;
+            }
+            if (pad1Y > canvas.height - padHeight - padOffset - padSpeedIncrement) {
+                pad1Y = canvas.height - padHeight - padOffset - padSpeedIncrement;
+            }
+
+            // Check pad2 collision with border
+            if (pad2Y < padOffset + padSpeedIncrement) {
+                pad2Y = padOffset + padSpeedIncrement;
+            }
+            if (pad2Y > canvas.height - padHeight - padOffset - padSpeedIncrement) {
+                pad2Y = canvas.height - padHeight - padOffset - padSpeedIncrement;
+            }
+
+            // Check ball collision with pad1
+            if (ballX < pad1X + padWidth + ballSize / 2 && ballY > pad1Y && ballY < (pad1Y + padHeight)) {
+                ballXVelocity *= -1;
+
+                // Change ball's Y velocity if ball hits closer to the pad's edge
+                var deltaY = ballY - (pad1Y + padHeight / 2);
+                ballYVelocity = deltaY * 0.035;
+            }
+
+            // Check ball collision with pad2
+            if (ballX > pad2X - ballSize / 2 && ballY > pad2Y && ballY < (pad2Y + padHeight)) {
+                ballXVelocity *= -1;
+
+                // Change ball's Y velocity if ball hits closer to the pad's edge
+                var deltaY = ballY - (pad2Y + padHeight / 2);
+                ballYVelocity = deltaY * 0.035;
+            }
+
+            // Computer movement
+            computerMovement();
+
+            // Move ball
+            ballX += ballXVelocity;
+            ballY += ballYVelocity;
+
+            // Move pads
+            pad1Y += pad1Speed;
+            pad2Y += pad2Speed;
+
+            // Draw center net
+            for (var i = 10; i < canvas.height; i += 40)
+                drawRect(canvas.width / 2 - 1, i, 1, 20, "grey");
+
+            // Draw ball
+            drawCircle(ballX, ballY, ballSize / 2);
+
+            // Draw pads
+            drawRect(pad1X, pad1Y, padWidth, padHeight);
+            drawRect(pad2X, pad2Y, padWidth, padHeight);
+
+            // Draw scores
+            drawText(pad1Score, canvas.width / 6, canvas.height / 8, "grey");
+            drawText(pad2Score, canvas.width - canvas.width / 6, canvas.height / 8, "grey");
+        }
+
+        function resetGame() {
+            ballX = canvas.width / 2 - ballSize / 2;
+            ballY = canvas.height / 2 - ballSize / 2;
+            ballXVelocity *= -1;
+            ballYVelocity = Math.floor(Math.random() * 2) % 2 == 0 ? 1 : -1;
+        }
+
+        function computerMovement() {
+            if (pad2Y + (padHeight / 2) < ballY - ballSize * computerRate) {
+                pad2Y += padSpeedIncrement;
+            } else if (pad2Y + (padHeight / 2) > ballY + ballSize * computerRate) {
+                pad2Y -= padSpeedIncrement;
+            }
+        }
+
+        function drawText(text, x, y, color = "white") {
+            canvasContext.fillStyle = color;
+            canvasContext.font = "20px Arial";
+            canvasContext.fillText(text, x, y);
+        }
+
+        function drawRect(x, y, w, h, color = "white") {
+            canvasContext.fillStyle = color;
+            canvasContext.fillRect(x, y, w, h);
+        }
+
+        function drawCircle(x, y, radius, color = "white") {
+            canvasContext.fillStyle = color;
+            canvasContext.beginPath();
+            canvasContext.arc(x, y, radius, 0, Math.PI * 2, true);
+            canvasContext.fill();
+        }
+
+        function keyPush() {
+            switch (event.keyCode) {
+                // case 87: // w
+                //     pad1Speed = -padSpeedIncrement;
+                //     break;
+                // case 83: // s
+                //     pad1Speed = padSpeedIncrement;
+                //     break;
+                case 38: // UP
+                    pad1Speed = -padSpeedIncrement;
+                    break;
+                case 40: // DOWN
+                    pad1Speed = padSpeedIncrement;
+                    break;
+            }
+        }
+
+        function keyUp() {
+            pad1Speed = 0;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Fractal Tree</title>
+</head>
+
+<body>
+    <div style="text-align: center;">
+        <canvas id="canvas" width="800" height="800"></canvas>
+    </div>
+    <script>
+        /**
+         * Fractal Tree in plain Javascript
+         * 
+         * Author: Carlos E. Torres
+         * E-mail: cetorres@cetorres.com          
+         */
+        var canvas;
+        var canvasContext;
+
+        window.onload = function () {
+            canvas = document.getElementById("canvas");
+            canvasContext = canvas.getContext("2d");
+
+            // Draw background
+            canvasContext.fillStyle = "black";
+            canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+
+            setTimeout(initTree, 200);
+        }
+
+        function initTree() {
+            canvasContext.translate(canvas.width / 2, canvas.height);
+            branch(200);
+        }
+
+        function branch(len) {
+            drawLine(0, 0, 0, -len);
+            canvasContext.translate(0, -len);
+
+            if (len > 4) {
+                canvasContext.save();
+                canvasContext.rotate(Math.PI / 8);
+                branch(len * 0.67);
+                canvasContext.restore();
+
+                canvasContext.save();
+                canvasContext.rotate(-Math.PI / 6);
+                branch(len * 0.67);
+                canvasContext.restore();
+            }
+        }
+
+        function drawLine(x1, y1, x2, y2, color = "white") {
+            canvasContext.strokeStyle = color;
+            canvasContext.moveTo(x1, y1);
+            canvasContext.lineTo(x2, y2);
+            canvasContext.stroke();
+        }
+    </script>
+</body>
+
+</html>
