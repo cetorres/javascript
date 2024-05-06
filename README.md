@@ -5,7 +5,7 @@ Some of my Javascript example codes creating interesting interactions and games 
 
 - [Pong](https://cetorres.github.io/javascript/pong.html)
 - [Snake](https://cetorres.github.io/javascript/snake.html)
-- [Interactive Bg](https://cetorres.github.io/javascript/interactive-bg.html)
+- [Interactive Bg](https://cetorres.github.io/javascript/interactive_bg.html)
 - [Game of Life](https://cetorres.github.io/javascript/game_of_life.html)
 - [Fractal tree](https://cetorres.github.io/javascript/fractal_tree.html)
 - [Clock](https://cetorres.github.io/javascript/clock.html)
